@@ -1,16 +1,16 @@
 import Post from "./Post";
 import Story from "./Story";
 import Navigation from "./Navigation";
-import MessageHeader from "./MessageHeader";
 export default function Home() {
         return (
           <main className="h-screen w-screen flex">
-            <aside className="h-screen w-screen gap-1 flex flex-col">
-                <MessageHeader />
+            <section className="h-screen w-screen gap-1 flex flex-col">
               <Navigation />
+              <section className="h-full w-full overflow-y-auto p-2">
               <Story />
               <Post />
-            </aside>
+              </section>
+            </section>
           </main>
         );
 }
