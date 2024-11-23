@@ -2,38 +2,35 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
-import path from "path";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Login from "./pages/Login.jsx";
-import Profile from "./pages/Profile.jsx";
-import Message from"./pages/Message"
-import Notification from "./pages/Notification.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import RegisterPage from "./pages/SignupPageg.jsx";
+import { QueryClient, QueryClientProvider } from "react-query";
+import isAuthenTicated from "./HOC/isAuthenticated.jsx";
+
+const PrivateRoute = isAuthenTicated(App);
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <PrivateRoute />,
   },
   {
     path: "/login",
-    element: <Login />,
+    element: <LoginPage />,
   },
   {
-    path: "/profile",
-    element: <Profile />
-  },
-  {
-    path: "/message",
-    element: <Message />
-  },
-  {
-    path: "/notification",
-    element: <Notification />
+    path: "/register",
+    element: <RegisterPage />,
   },
 ]);
 
+const queryClient = new QueryClient();
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
   </StrictMode>
 );
