@@ -36,7 +36,7 @@ export const loginAPI = async(postData) => {
     return res
 }
 
-// export const AccessToken = sessionStorage.getItem('user')
+export const AccessToken = sessionStorage.getItem('user')
 
 export const verifyToken = async(accessToken) => {
     // console.log(accessToken)

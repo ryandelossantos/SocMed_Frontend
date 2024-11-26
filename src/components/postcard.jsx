@@ -1,21 +1,30 @@
 import { useState } from "react";
 import axios from "axios";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Edit, Save, Cancel } from "lucide-react";
+import { Edit, Save, X } from "lucide-react";
+import { AccessToken } from "../API/auth";
 
 export default function PostCard({ post, user }) {
   const [editing, setEditing] = useState(false);
   const [newContent, setNewContent] = useState(post.content);
   const [newPostImage, setNewPostImage] = useState(null);
 
-  const handleLike = (postId) => {
-    axios
-      .post(`http://localhost:8000/api/posts/${postId}/like/`)
-      .then((response) => {
-      })
-      .catch((error) => console.error("Error liking post:", error));
+  const handleLike = async (postId) => {
+    
+    axios.post(`http://localhost:8000/api/posts/${postId}/like/`, {}, {
+      headers: {
+        'Authorization': `Bearer ${AccessToken}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then((response) => {
+      console.log('Post liked:', response.data);
+    })
+    .catch((error) => {
+      console.error('Error liking post:', error);
+    });
   };
-
+  
   const handleSave = () => {
     const formData = new FormData();
     formData.append("content", newContent);
@@ -59,7 +68,7 @@ export default function PostCard({ post, user }) {
                   <Save />
                 </button>
                 <button onClick={handleCancel} className="text-white">
-                  <Cancel />
+                  <X />
                 </button>
               </>
             ) : (

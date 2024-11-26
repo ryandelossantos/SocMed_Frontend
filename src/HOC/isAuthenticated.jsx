@@ -1,5 +1,4 @@
 // import App from "../App"
-
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { verifyToken } from "../API/auth";

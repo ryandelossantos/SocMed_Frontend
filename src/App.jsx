@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { registerAPI, loginAPI, verifyToken } from "./API/auth";
 import Navbar from "./components/navbar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,38 +10,84 @@ function App() {
   const [newPostImage, setNewPostImage] = useState(null);
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [token, setToken] = useState(sessionStorage.getItem('user') || '');
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/api/posts/")
-      .then((response) => setPosts(response.data))
-      .catch((error) => console.error("Error fetching posts:", error));
-    axios
-      .get("http://localhost:8000/api/user/me/", {
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
-        },
-      })
-      .then((response) => setUser(response.data))
-      .catch((error) => console.error("Error fetching user data:", error));
-  }, []);
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/posts/', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
 
-  const handleCreatePost = () => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setPosts(data);
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    };
+
+    const fetchUser = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/auth/users/', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.status === 404) {
+          throw new Error('Resource not found (404)');
+        }
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setUser(data);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    if (token) {
+      fetchPosts();
+      fetchUser();
+    }
+  }, [token]);
+
+  const handleCreatePost = async () => {
     const formData = new FormData();
     formData.append("content", newPostContent);
     if (newPostImage) formData.append("media", newPostImage);
 
-    axios
-      .post("http://localhost:8000/api/posts/", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      })
-      .then((response) => {
-        setPosts([response.data, ...posts]);
-        setNewPostContent("");
-        setNewPostImage(null);
-      })
-      .catch((error) => console.error("Error creating post:", error));
-  };
+  
+      const response = await fetch("http://localhost:8000/api/posts/", {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+          // Do not set 'Content-Type' here
+        },
+        body: formData
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      setPosts([data, ...posts]);
+      setNewPostContent("");
+      setNewPostImage(null);
+    }
+  
 
   return (
     <main className="w-screen h-screen bg-black/80 flex flex-col gap-3 overflow-y-auto">
