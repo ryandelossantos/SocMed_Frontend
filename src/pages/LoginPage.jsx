@@ -60,7 +60,7 @@ export default function LoginPage() {
         <Input placeholder="Password" type="password" ref={passwordRef} />
         <div className="flex gap-3 my-5">
           <p className="text-gray-400">don't have an account ? </p>
-          <a href="/register" className="text-blue-400 underline">
+          <a href="/SignupPage" className="text-blue-400 underline">
             Signup
           </a>
         </div>

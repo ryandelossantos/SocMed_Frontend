@@ -3,35 +3,64 @@ import axios from "axios";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Edit, Save, X } from "lucide-react";
 import { AccessToken } from "../API/auth";
+import { baseURL } from "../API";
 
-export default function PostCard({ post, user }) {
+export default function PostCard({ post, user ,refreshpostdata, setRefreshPostData}) {
   const [editing, setEditing] = useState(false);
   const [newContent, setNewContent] = useState(post.content);
   const [newPostImage, setNewPostImage] = useState(null);
 
   const handleLike = async (postId) => {
-    
-    axios.post(`http://localhost:8000/api/posts/${postId}/like/`, {}, {
-      headers: {
-        'Authorization': `Bearer ${AccessToken}`,
-        'Content-Type': 'application/json'
-      }
-    })
-    .then((response) => {
-      console.log('Post liked:', response.data);
-    })
-    .catch((error) => {
-      console.error('Error liking post:', error);
-    });
+    if (AccessToken) {
+      console.log('AccessToken:', AccessToken);
+      fetch(`${baseURL}/posts/${postId}/like`,{
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${AccessToken}`,
+          'Content-Type': 'application/json'
+        },
+      })
+      .then(response => {
+        if(!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Post liked:', data);
+        setRefreshPostData(!refreshpostdata)
+      })
+      .catch(error => {
+        console.error('Error liking post:', error);
+        if (error instanceof SyntaxError) {
+          fetch(`${baseURL}/posts/${postId}/like`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${AccessToken}`,
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(response => response.text())
+          .then(text => console.log('Response text:', text));
+        }
+      });
+    } else {
+      console.error('No access token found');
+    }
   };
-  
+  const handleComment = (postId) =>{
+    if(AccessToken){
+      fetch(`${baseURL}/posts/${postId}/comment`)
+    }
+  }
+
   const handleSave = () => {
     const formData = new FormData();
     formData.append("content", newContent);
     if (newPostImage) formData.append("media", newPostImage);
 
     axios
-      .put(`http://localhost:8000/api/posts/${post.id}/`, formData, {
+      .put(`${baseURL}/posts/${post.id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       .then((response) => {
@@ -46,19 +75,18 @@ export default function PostCard({ post, user }) {
   };
 
   return (
-    <div className="bg-black/80 py-3 rounded-md">
+    <div className="w-full bg-black/80 py-3 rounded-md">
       <div className="flex items-center justify-between px-3 text-white">
         <div className="flex gap-3 items-center">
           <Avatar>
             <AvatarImage src={user?.profile_image || "https://www.mfi.org.ph/wp-content/uploads/2020/04/mfi-logo.png"} />
-            <AvatarFallback>{user?.username?.[0]}</AvatarFallback>
+            <AvatarFallback>{user?.username?.[postId]}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
-            <p>{user?.username}</p>
+            <p>{user ?.username}</p>
             <p className="text-xs text-gray-400">{new Date(post.created_at).toLocaleString()}</p>
           </div>
         </div>
-
         {/* Edit / Save / Cancel Buttons */}
         {user?.id === post.user.id && (
           <div className="flex items-center gap-2">
@@ -99,7 +127,7 @@ export default function PostCard({ post, user }) {
         <button onClick={() => handleLike(post.id)} className="text-white">
           👍 {post.likes_count} Likes
         </button>
-        <button className="text-white">💬 {post.comments_count} Comments</button>
+        <button onClick={() => handleComment(post.id)} className="text-white">💬 {post.comments_count} Comments</button>
       </div>
     </div>
   );

@@ -9,11 +9,8 @@ export const registerAPI = async (postData) => {
         },
         body: JSON.stringify(postData)
     })
-
     const res = await response.json()
-
     console.log('response',res)
-
     if(res.ok){
         return res.data
     }
@@ -37,13 +34,15 @@ export const loginAPI = async(postData) => {
 }
 
 export const AccessToken = sessionStorage.getItem('user')
+console.log(AccessToken);
 
 export const verifyToken = async(accessToken) => {
     // console.log(accessToken)
     const response = await fetch(`${baseURL}/token/verify/` , {
         method: "POST",
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            
         },
         body: JSON.stringify({token: accessToken})
     })
