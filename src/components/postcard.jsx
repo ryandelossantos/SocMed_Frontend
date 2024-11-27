@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState , useEffect} from "react";
 import axios from "axios";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Edit, Save, X } from "lucide-react";
 import { AccessToken } from "../API/auth";
 import { baseURL } from "../API";
+import { jwtDecode } from "jwt-decode";
 
 export default function PostCard({ post, user ,refreshpostdata, setRefreshPostData}) {
   const [editing, setEditing] = useState(false);
@@ -73,14 +74,15 @@ export default function PostCard({ post, user ,refreshpostdata, setRefreshPostDa
     setEditing(false);
     setNewContent(post.content);
   };
+  const userinfo = jwtDecode(sessionStorage.getItem('user'))
 
   return (
     <div className="w-full bg-black/80 py-3 rounded-md">
       <div className="flex items-center justify-between px-3 text-white">
         <div className="flex gap-3 items-center">
           <Avatar>
-            <AvatarImage src={user?.profile_image || "https://www.mfi.org.ph/wp-content/uploads/2020/04/mfi-logo.png"} />
-            <AvatarFallback>{user?.username?.[postId]}</AvatarFallback>
+            <AvatarImage src={``|| "https://www.mfi.org.ph/wp-content/uploads/2020/04/mfi-logo.png"} />
+            <AvatarFallback>{userinfo.username?.[userinfo.id]}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
             <p>{user ?.username}</p>

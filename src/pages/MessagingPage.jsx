@@ -1,4 +1,5 @@
-import MessagingPanel from "./components/MessagingPanel";
+import MessagingPanel from "../components/MessagePanel/MessagePanel";
+import Navbar from "../components/navbar";
 
 export default function MessagingPage() {
   return (

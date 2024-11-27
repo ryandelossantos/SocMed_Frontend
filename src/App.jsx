@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { registerAPI, loginAPI, verifyToken } from "./API/auth";
+import { registerAPI, loginAPI, verifyToken, AccessToken } from "./API/auth";
 import Navbar from "./components/navbar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ function App() {
   const [token, setToken] = useState(sessionStorage.getItem('user') || '');
   const [refreshpostdata, setRefreshPostData] = useState(false);
   const [newImage, setNewImage] = useState(null);
-
+  
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -58,6 +58,7 @@ function App() {
         }
 
         const data = await response.json();
+        console.log(data)
         setUser(data);
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -100,8 +101,8 @@ function App() {
         const formData = new FormData();
         formData.append("image", file);
     
-        fetch("/api/upload-image", {
-          method: "POST",
+        fetch("http://127.0.0.1:8000/api/auth/users/", {
+          method: "PATCH",
           body: formData,
         })
           .then((response) => response.json())
@@ -113,7 +114,7 @@ function App() {
               userId: user.id,
               timestamp: new Date().toISOString(),
             };
-            fetch("/api/create-post", {
+            fetch("http://127.0.0.1:8000/api/posts/", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -176,8 +177,8 @@ function App() {
   </div>
 
   {/* Display Posts Section */}
-  <section className="flex flex-col sm:flex-row gap-2 w-full overflow-x min-w-0">
-    <div className="w-full overflow-x-auto flex flex-col sm:flex-row gap-2">
+  <section className="flex flex-col gap-2 w-full overflow-x min-w-0">
+    <div className="w-full overflow-y-auto flex flex-col gap-2">
       {/* Post Cards */}
       {posts.map((post) => (
         <PostCard key={post.id} post={post} user={user} refreshpostdata={refreshpostdata} setRefreshPostData={setRefreshPostData} />

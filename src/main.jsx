@@ -7,7 +7,7 @@ import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/SignupPageg.jsx";
 import { QueryClient, QueryClientProvider } from "react-query";
 import isAuthenTicated from "./HOC/isAuthenticated.jsx";
-
+import MessagingPage from "./pages/MessagingPage.jsx";
 const PrivateRoute = isAuthenTicated(App);
 
 const router = createBrowserRouter([
@@ -22,6 +22,10 @@ const router = createBrowserRouter([
   {
     path: "/SignupPage",
     element: <RegisterPage />,
+  },
+  {
+    path:"/messaging",
+    element: <MessagingPage />
   },
 ]);
 

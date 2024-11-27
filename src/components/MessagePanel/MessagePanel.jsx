@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { getCurrentUser } from "../api/auth";
 
 export default function MessagingPanel() {
   const [messages, setMessages] = useState([]);
